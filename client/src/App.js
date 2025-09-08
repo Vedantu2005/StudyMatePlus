@@ -16,6 +16,9 @@ import ScrollToTop from "./components/scrolltotop";
 import MindMapEditor from "./pages/MindMapEditor";
 import Profile from "./pages/Profile.js";
 import SubmitFeedback from "./pages/SubmitFeedback";
+// 1. Import the Login and Signup components
+import Login from "./pages/login";
+import Signup from "./pages/signup";
 
 
 const App = () => {
@@ -34,12 +37,13 @@ const App = () => {
           <Route path="/feedback" element={<Feedback />} />
           <Route path="/about" element={<About />} />
           <Route path="/privacy" element={<Privacy />} />
-          <Route path="/privacy" element={<Privacy />} />
           <Route path="/contribute" element={<Contribute />} />
           <Route path="/mindmap" element={<MindMapEditor />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/feedback/submit" element={<SubmitFeedback />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
         </Routes>
       </div>
     </Router>
@@ -47,3 +51,4 @@ const App = () => {
 };
 
 export default App;
+

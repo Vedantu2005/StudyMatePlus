@@ -40,16 +40,16 @@
   color: #4c51bf;
 }
 
-/* --- NEW --- Wrapper for all right-side elements */
+/* Wrapper for all right-side elements */
 .navbar-right {
   display: flex;
   align-items: center;
-  gap: 1.5rem; /* This sets the space between nav links and the profile icon */
+  gap: 1.5rem;
 }
 
 /* Desktop navigation links */
 .navbar-links {
-  display: flex; /* This remains flex for desktop layout */
+  display: flex;
   gap: 1.5rem;
   align-items: center;
   list-style: none;
@@ -65,6 +65,7 @@
   padding: 0.4rem 0.8rem;
   border-radius: 6px;
   transition: background-color 0.2s ease, color 0.2s ease;
+  white-space: nowrap; /* Prevents wrapping for login/signup */
 }
 
 .navbar-link:hover,
@@ -72,6 +73,30 @@
   background-color: #edf2f7;
   color: #2d3748;
 }
+
+/* --- NEW --- Styles for the authenticated user section */
+.navbar-auth-section {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem; /* Space between profile icon and logout button */
+}
+
+/* --- NEW --- Logout Button Style */
+.navbar-logout-button {
+    background-color: #e53e3e;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.navbar-logout-button:hover {
+    background-color: #c53030;
+}
+
 
 /* Mobile toggle button (hamburger icon) */
 .navbar-toggle {
@@ -150,6 +175,29 @@
   color: #2b6cb0;
 }
 
+
+/* --- NEW --- Divider in mobile menu */
+.navbar-mobile-divider {
+    border: none;
+    border-top: 1px solid #e2e8f0;
+    margin: 0.5rem 0;
+}
+
+/* --- NEW --- Mobile Logout Button */
+.navbar-link-mobile-button {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    color: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    text-align: left;
+    width: 100%;
+    cursor: pointer;
+}
+
+
 /* Profile Image styles */
 .navbar-profile-link {
   display: flex;
@@ -175,7 +223,7 @@
 }
 
 /* --- RESPONSIVE STYLES --- */
-@media (max-width: 768px) {
+@media (max-width: 992px) { /* Adjusted breakpoint for better wrapping */
   /* Hide the desktop links list */
   .navbar-links {
     display: none;
@@ -185,7 +233,13 @@
   .navbar-toggle {
     display: block;
   }
+
+  /* Ensure the auth section is also hidden on desktop, as it's in the mobile menu */
+  .navbar-auth-section {
+      display: none;
+  }
 }
+
 
 @media (max-width: 480px) {
   .navbar {

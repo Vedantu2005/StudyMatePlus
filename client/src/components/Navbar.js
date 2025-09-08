@@ -1,97 +1,143 @@
-// STEP 1: Import NavLink along with Link
 import React, { useState, useEffect } from "react";
-import { Link, NavLink } from "react-router-dom"; // CHANGED HERE
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import "./Navbar.css";
 
-const user = {
-  avatar: "https://avatar.iran.liara.run/public/boy",
-};
-
 const Navbar = () => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    // Check for token to determine initial auth state
+    const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'));
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
+    const navigate = useNavigate();
 
-  const closeMobileMenu = () => {
-    setIsMobileMenuOpen(false);
-  };
+    // This effect will listen for changes to the auth state (e.g., after login/logout)
+    // A more robust solution might use React Context to manage this globally
+    useEffect(() => {
+        const handleStorageChange = () => {
+            setIsAuthenticated(!!localStorage.getItem('token'));
+        };
+        // This is a custom event you might dispatch after login/logout
+        // to ensure all components update.
+        window.addEventListener('storage', handleStorageChange);
+        window.addEventListener('authChange', handleStorageChange);
 
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth > 768) {
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+            window.removeEventListener('authChange', handleStorageChange);
+        };
+    }, []);
+
+
+    const toggleMobileMenu = () => {
+        setIsMobileMenuOpen(!isMobileMenuOpen);
+    };
+
+    const closeMobileMenu = () => {
         setIsMobileMenuOpen(false);
-      }
     };
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        setIsAuthenticated(false);
+        closeMobileMenu();
+        // Dispatch a custom event to notify other components if needed
+        window.dispatchEvent(new Event('authChange'));
+        navigate('/login'); // Redirect to login page after logout
     };
-  }, []);
 
-  return (
-    <nav className="navbar">
-      <div className="navbar-container">
-        {/* Logo and Profile still use <Link> which is fine */}
-        <Link to="/" className="navbar-brand">
-          <img
-            src="/logo.png"
-            alt="StudyMatePlus Logo"
-            className="navbar-logo"
-          />
-        </Link>
+    // Placeholder avatar, you can fetch the real one later
+    const userAvatar = "https://avatar.iran.liara.run/public/boy";
 
-        <div className="navbar-right">
-          
-          {/* STEP 2: Change Desktop <Link> to <NavLink> */}
-          <ul className="navbar-links">
-            <li><NavLink to="/" className="navbar-link">Home</NavLink></li>
-            <li><NavLink to="/about" className="navbar-link">About Us</NavLink></li>
-            <li><NavLink to="/syllabus" className="navbar-link">Syllabus</NavLink></li>
-            <li><NavLink to="/notes" className="navbar-link">Notes</NavLink></li>
-            <li><NavLink to="/pyqs" className="navbar-link">PYQs</NavLink></li>
-            <li><NavLink to="/analytics" className="navbar-link">Analytics</NavLink></li>
-            <li><NavLink to="/mindmap" className="navbar-link">Mind Map</NavLink></li>
-            <li><NavLink to="/feedback" className="navbar-link">Feedback</NavLink></li>
-            <li><NavLink to="/faq" className="navbar-link">FAQs</NavLink></li>
-          </ul>
-          {/* END OF STEP 2 CHANGE */}
+    const authLinks = (
+        <>
+            <Link to="/profile" className="navbar-profile-link" onClick={closeMobileMenu}>
+                <img
+                    src={userAvatar}
+                    alt="User Profile"
+                    className="navbar-profile-img"
+                />
+            </Link>
+            <button onClick={handleLogout} className="navbar-logout-button">Logout</button>
+        </>
+    );
+
+    const mobileAuthLinks = (
+        <>
+            <li><NavLink to="/profile" className="navbar-link-mobile" onClick={closeMobileMenu}>Profile</NavLink></li>
+            <li><button className="navbar-link-mobile-button" onClick={handleLogout}>Logout</button></li>
+        </>
+    );
+
+    const mobileGuestLinks = (
+        <>
+            <li><NavLink to="/login" className="navbar-link-mobile" onClick={closeMobileMenu}>Login</NavLink></li>
+            <li><NavLink to="/signup" className="navbar-link-mobile" onClick={closeMobileMenu}>Sign Up</NavLink></li>
+        </>
+    );
 
 
-          <Link to="/profile" className="navbar-profile-link">
-            <img
-              src={user.avatar}
-              alt="User Profile"
-              className="navbar-profile-img"
-            />
-          </Link>
+    return (
+        <nav className="navbar">
+            <div className="navbar-container">
+                <Link to="/" className="navbar-brand">
+                    <img
+                        src="/logo.png"
+                        alt="StudyMatePlus Logo"
+                        className="navbar-logo"
+                    />
+                </Link>
 
-          <button className="navbar-toggle" onClick={toggleMobileMenu}>
-            ☰
-          </button>
-        </div>
-      </div>
+                <div className="navbar-right">
+                    <ul className="navbar-links">
+                        {/* UPDATED: Added 'end' prop to the Home NavLink */}
+                        <li><NavLink to="/" className="navbar-link" end>Home</NavLink></li>
+                        <li><NavLink to="/about" className="navbar-link">About Us</NavLink></li>
+                        <li><NavLink to="/syllabus" className="navbar-link">Syllabus</NavLink></li>
+                        <li><NavLink to="/notes" className="navbar-link">Notes</NavLink></li>
+                        <li><NavLink to="/pyqs" className="navbar-link">PYQs</NavLink></li>
+                        <li><NavLink to="/analytics" className="navbar-link">Analytics</NavLink></li>
+                        <li><NavLink to="/mindmap" className="navbar-link">Mind Map</NavLink></li>
+                        <li><NavLink to="/feedback" className="navbar-link">Feedback</NavLink></li>
+                        <li><NavLink to="/faq" className="navbar-link">FAQs</NavLink></li>
+                        
+                        {!isAuthenticated && (
+                            <>
+                                <li><NavLink to="/login" className="navbar-link">Login</NavLink></li>
+                                <li><NavLink to="/signup" className="navbar-link">Sign Up</NavLink></li>
+                            </>
+                        )}
+                    </ul>
 
-      <div className={`navbar-menu-mobile ${isMobileMenuOpen ? "active" : ""}`}>
-        
-        {/* STEP 3: Change Mobile <Link> to <NavLink> */}
-        <ul className="navbar-links-mobile">
-          <li><NavLink to="/" className="navbar-link-mobile" onClick={closeMobileMenu}>Home</NavLink></li>
-          <li><NavLink to="/about" className="navbar-link-mobile" onClick={closeMobileMenu}>About Us</NavLink></li>
-          <li><NavLink to="/syllabus" className="navbar-link-mobile" onClick={closeMobileMenu}>Syllabus</NavLink></li>
-          <li><NavLink to="/notes" className="navbar-link-mobile" onClick={closeMobileMenu}>Notes</NavLink></li>
-          <li><NavLink to="/pyqs" className="navbar-link-mobile" onClick={closeMobileMenu}>PYQs</NavLink></li>
-          <li><NavLink to="/analytics" className="navbar-link-mobile" onClick={closeMobileMenu}>Analytics</NavLink></li>
-          <li><NavLink to="/mindmap" className="navbar-link-mobile" onClick={closeMobileMenu}>Mind Map</NavLink></li>
-          <li><NavLink to="/feedback" className="navbar-link-mobile" onClick={closeMobileMenu}>Feedback</NavLink></li>
-          <li><NavLink to="/faq" className="navbar-link-mobile" onClick={closeMobileMenu}>FAQs</NavLink></li>
-        </ul>
-        {/* END OF STEP 3 CHANGE */}
+                    {isAuthenticated && (
+                        <div className="navbar-auth-section">
+                            {authLinks}
+                        </div>
+                    )}
 
-      </div>
-    </nav>
-  );
+                    <button className="navbar-toggle" onClick={toggleMobileMenu}>
+                        ☰
+                    </button>
+                </div>
+            </div>
+
+            <div className={`navbar-menu-mobile ${isMobileMenuOpen ? "active" : ""}`}>
+                <ul className="navbar-links-mobile">
+                    {/* UPDATED: Added 'end' prop to the mobile Home NavLink */}
+                    <li><NavLink to="/" className="navbar-link-mobile" onClick={closeMobileMenu} end>Home</NavLink></li>
+                    <li><NavLink to="/about" className="navbar-link-mobile" onClick={closeMobileMenu}>About Us</NavLink></li>
+                    <li><NavLink to="/syllabus" className="navbar-link-mobile" onClick={closeMobileMenu}>Syllabus</NavLink></li>
+                    <li><NavLink to="/notes" className="navbar-link-mobile" onClick={closeMobileMenu}>Notes</NavLink></li>
+                    <li><NavLink to="/pyqs" className="navbar-link-mobile" onClick={closeMobileMenu}>PYQs</NavLink></li>
+                    <li><NavLink to="/analytics" className="navbar-link-mobile" onClick={closeMobileMenu}>Analytics</NavLink></li>
+                    <li><NavLink to="/mindmap" className="navbar-link-mobile" onClick={closeMobileMenu}>Mind Map</NavLink></li>
+                    <li><NavLink to="/feedback" className="navbar-link-mobile" onClick={closeMobileMenu}>Feedback</NavLink></li>
+                    <li><NavLink to="/faq" className="navbar-link-mobile" onClick={closeMobileMenu}>FAQs</NavLink></li>
+                    <hr className="navbar-mobile-divider" />
+                    {isAuthenticated ? mobileAuthLinks : mobileGuestLinks}
+                </ul>
+            </div>
+        </nav>
+    );
 };
 
 export default Navbar;
+
